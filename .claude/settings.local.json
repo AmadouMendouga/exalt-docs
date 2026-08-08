@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"c:/Users/amado/OneDrive/Documents/Projet Adobe/Travaux EXALT/Ressources/Documents client/exalt-docs\" && mv BRIEF.md ../BRIEF.md.bak && ls -la)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\amado\\OneDrive\\Documents\\Projet Adobe\\Travaux EXALT\\Ressources\\Documents client"
+    ]
+  }
+}
