@@ -18,7 +18,7 @@ async function importerCle(secret: string): Promise<CryptoKey> {
 }
 
 async function signer(valeur: string): Promise<string> {
-  const cle = await importerCle(env.adminPassword);
+  const cle = await importerCle(env.sessionSecret);
   const signatureBuf = await crypto.subtle.sign("HMAC", cle, new TextEncoder().encode(valeur));
   return Buffer.from(signatureBuf).toString("hex");
 }

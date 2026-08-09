@@ -18,6 +18,9 @@ export const env = {
   get adminPassword() {
     return requireEnv("ADMIN_PASSWORD");
   },
+  get sessionSecret() {
+    return requireEnv("SESSION_SECRET");
+  },
   get institutWhatsapp() {
     return requireEnv("INSTITUT_WHATSAPP");
   },
