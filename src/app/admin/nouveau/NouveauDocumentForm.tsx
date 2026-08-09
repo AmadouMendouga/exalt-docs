@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, FormEvent } from "react";
+import { useRef, useState, SubmitEvent } from "react";
 import Link from "next/link";
 import { creerDocument, DocumentCree } from "./actions";
 
@@ -10,22 +10,29 @@ export default function NouveauDocumentForm() {
   const [erreur, setErreur] = useState<string | null>(null);
   const [resultat, setResultat] = useState<DocumentCree | null>(null);
 
-  async function soumettre(e: FormEvent<HTMLFormElement>) {
+  async function soumettre(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setEnCours(true);
     setErreur(null);
 
     const formData = new FormData(e.currentTarget);
-    const reponse = await creerDocument(formData);
-    setEnCours(false);
+    try {
+      const reponse = await creerDocument(formData);
 
-    if (!reponse.succes) {
-      setErreur(reponse.erreur);
-      return;
+      if (!reponse.succes) {
+        setErreur(reponse.erreur);
+        return;
+      }
+
+      setResultat(reponse.document);
+      formRef.current?.reset();
+    } catch {
+      setErreur(
+        "Échec de la connexion au serveur. Vérifiez votre connexion internet et réessayez."
+      );
+    } finally {
+      setEnCours(false);
     }
-
-    setResultat(reponse.document);
-    formRef.current?.reset();
   }
 
   if (resultat) {
