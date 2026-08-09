@@ -4,6 +4,9 @@ import { useState } from "react";
 import { regenererCode } from "./actions";
 import Preloader from "@/components/Preloader";
 import CocheSucces from "@/components/CocheSucces";
+import { attendreMinimum } from "@/lib/attendreMinimum";
+
+const DUREE_MIN_CHARGEMENT_MS = 600;
 
 export default function RegenererCodeBouton({ id }: { id: string }) {
   const [enCours, setEnCours] = useState(false);
@@ -25,7 +28,7 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
 
     setEnCours(true);
     setErreur(null);
-    const reponse = await regenererCode(id);
+    const reponse = await attendreMinimum(regenererCode(id), DUREE_MIN_CHARGEMENT_MS);
     setEnCours(false);
 
     if (!reponse.succes) {

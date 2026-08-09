@@ -6,10 +6,12 @@ import CodeInputOtp from "./CodeInputOtp";
 import Preloader from "@/components/Preloader";
 import CocheSucces from "@/components/CocheSucces";
 import SkeletonDocument from "@/components/SkeletonDocument";
+import { attendreMinimum } from "@/lib/attendreMinimum";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 const LONGUEUR_CODE = 6;
+const DUREE_MIN_CHARGEMENT_MS = 600;
 
 type Etat =
   | { phase: "saisie" }
@@ -92,11 +94,14 @@ export default function CodeForm({ slug }: { slug: string }) {
 
     setEtat({ phase: "chargement" });
     try {
-      const reponse = await fetch("/api/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, code: codeComplet }),
-      });
+      const reponse = await attendreMinimum(
+        fetch("/api/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, code: codeComplet }),
+        }),
+        DUREE_MIN_CHARGEMENT_MS
+      );
       const donnees = await reponse.json();
 
       if (!reponse.ok) {

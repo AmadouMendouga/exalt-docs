@@ -5,6 +5,9 @@ import Link from "next/link";
 import { creerDocument, DocumentCree } from "./actions";
 import Preloader from "@/components/Preloader";
 import CocheSucces from "@/components/CocheSucces";
+import { attendreMinimum } from "@/lib/attendreMinimum";
+
+const DUREE_MIN_CHARGEMENT_MS = 600;
 
 export default function NouveauDocumentForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -19,7 +22,7 @@ export default function NouveauDocumentForm() {
 
     const formData = new FormData(e.currentTarget);
     try {
-      const reponse = await creerDocument(formData);
+      const reponse = await attendreMinimum(creerDocument(formData), DUREE_MIN_CHARGEMENT_MS);
 
       if (!reponse.succes) {
         setErreur(reponse.erreur);
