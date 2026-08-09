@@ -33,7 +33,7 @@ export default async function PageAdmin() {
     <div className="flex flex-1 flex-col">
       <AdminNav />
       <main className="flex flex-1 flex-col px-6 py-10 sm:px-10">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-serif text-2xl" style={{ color: "#90503b" }}>
             Documents
           </h1>
