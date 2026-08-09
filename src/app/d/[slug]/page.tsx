@@ -1,4 +1,4 @@
-import CodeForm from "./CodeForm";
+import CodeFormLoader from "./CodeFormLoader";
 
 export default async function PageDocument({
   params,
@@ -35,7 +35,7 @@ export default async function PageDocument({
           >
             Votre document vous attend
           </h1>
-          <CodeForm slug={slug} />
+          <CodeFormLoader slug={slug} />
         </div>
 
         <p className="max-w-sm text-center text-xs" style={{ color: "#231f20", opacity: 0.55 }}>

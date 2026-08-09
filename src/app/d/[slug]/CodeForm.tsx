@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useEffect, useRef, useState, SubmitEvent } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 type Etat =
   | { phase: "saisie" }
@@ -21,8 +24,21 @@ const MESSAGES_ERREUR: Record<string, string> = {
 export default function CodeForm({ slug }: { slug: string }) {
   const [code, setCode] = useState("");
   const [etat, setEtat] = useState<Etat>({ phase: "saisie" });
+  const [nombrePages, setNombrePages] = useState<number | null>(null);
+  const [pageActuelle, setPageActuelle] = useState(1);
+  const [largeurConteneur, setLargeurConteneur] = useState(0);
+  const conteneurRef = useRef<HTMLDivElement>(null);
 
-  async function soumettre(e: FormEvent) {
+  useEffect(() => {
+    if (etat.phase !== "succes" || !conteneurRef.current) return;
+    const observateur = new ResizeObserver(([entree]) => {
+      setLargeurConteneur(entree.contentRect.width);
+    });
+    observateur.observe(conteneurRef.current);
+    return () => observateur.disconnect();
+  }, [etat.phase]);
+
+  async function soumettre(e: SubmitEvent) {
     e.preventDefault();
     if (code.trim().length !== 6) {
       setEtat({ phase: "erreur", message: "Le code d'accès comporte 6 caractères." });
@@ -55,9 +71,65 @@ export default function CodeForm({ slug }: { slug: string }) {
   if (etat.phase === "succes") {
     return (
       <div className="flex w-full flex-col items-center gap-4">
-        <div className="w-full overflow-hidden rounded border" style={{ borderColor: "#dbc1b4" }}>
-          <iframe src={etat.url} title="Document" className="h-[70vh] w-full bg-white" />
+        <div
+          ref={conteneurRef}
+          className="flex w-full justify-center overflow-hidden rounded border bg-white"
+          style={{ borderColor: "#dbc1b4" }}
+        >
+          <Document
+            file={etat.url}
+            onLoadSuccess={({ numPages }) => {
+              setNombrePages(numPages);
+              setPageActuelle(1);
+            }}
+            loading={
+              <p className="p-8 text-sm" style={{ color: "#231f20", opacity: 0.6 }}>
+                Chargement du document...
+              </p>
+            }
+            error={
+              <p className="p-8 text-sm" style={{ color: "#90503b" }}>
+                Impossible d&rsquo;afficher l&rsquo;aperçu. Utilisez le téléchargement ci-dessous.
+              </p>
+            }
+          >
+            {largeurConteneur > 0 && (
+              <Page
+                pageNumber={pageActuelle}
+                width={largeurConteneur}
+                renderAnnotationLayer={false}
+                renderTextLayer={false}
+              />
+            )}
+          </Document>
         </div>
+
+        {nombrePages && nombrePages > 1 && (
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setPageActuelle((p) => Math.max(1, p - 1))}
+              disabled={pageActuelle <= 1}
+              className="rounded px-3 py-1.5 text-sm font-medium disabled:opacity-40"
+              style={{ backgroundColor: "#dbc1b4", color: "#231f20" }}
+            >
+              Précédent
+            </button>
+            <span className="text-sm" style={{ color: "#231f20" }}>
+              Page {pageActuelle} / {nombrePages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPageActuelle((p) => Math.min(nombrePages, p + 1))}
+              disabled={pageActuelle >= nombrePages}
+              className="rounded px-3 py-1.5 text-sm font-medium disabled:opacity-40"
+              style={{ backgroundColor: "#dbc1b4", color: "#231f20" }}
+            >
+              Suivant
+            </button>
+          </div>
+        )}
+
         <a
           href={etat.url}
           download
