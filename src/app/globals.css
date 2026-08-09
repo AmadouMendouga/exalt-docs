@@ -26,3 +26,209 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+@keyframes exalt-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes exalt-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes exalt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes exalt-fade-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes exalt-coche-trait {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.exalt-anim-shake {
+  animation: exalt-shake 0.4s ease-in-out;
+}
+
+.exalt-anim-pulse {
+  animation: exalt-pulse 1.4s ease-in-out infinite;
+}
+
+.exalt-anim-spin {
+  animation: exalt-spin 0.7s linear infinite;
+}
+
+.exalt-anim-fade-scale-in {
+  animation: exalt-fade-scale-in 0.35s ease-out;
+}
+
+.exalt-anim-coche-trait {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: exalt-coche-trait 0.4s 0.1s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exalt-anim-shake,
+  .exalt-anim-pulse,
+  .exalt-anim-spin,
+  .exalt-anim-fade-scale-in {
+    animation: none;
+  }
+
+  .exalt-anim-coche-trait {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}
+
+/* Preloader — yeux et bouche qui se recomposent en boucle */
+@keyframes exalt-preloader-oeil1 {
+  from {
+    transform: rotate(-260deg) translate(0, -56px);
+  }
+  50%,
+  60% {
+    animation-timing-function: cubic-bezier(0.17, 0, 0.58, 1);
+    transform: rotate(-40deg) translate(0, -56px) scale(1);
+  }
+  to {
+    transform: rotate(225deg) translate(0, -56px) scale(0.35);
+  }
+}
+
+@keyframes exalt-preloader-oeil2 {
+  from {
+    transform: rotate(-260deg) translate(0, -56px);
+  }
+  50% {
+    transform: rotate(40deg) translate(0, -56px) rotate(-40deg) scale(1);
+  }
+  52.5% {
+    transform: rotate(40deg) translate(0, -56px) rotate(-40deg) scale(1, 0);
+  }
+  55%,
+  70% {
+    animation-timing-function: cubic-bezier(0, 0, 0.28, 1);
+    transform: rotate(40deg) translate(0, -56px) rotate(-40deg) scale(1);
+  }
+  to {
+    transform: rotate(150deg) translate(0, -56px) scale(0.4);
+  }
+}
+
+@keyframes exalt-preloader-bouche1 {
+  from {
+    animation-timing-function: ease-in;
+    stroke-dasharray: 0 351.86;
+    stroke-dashoffset: 0;
+  }
+  25% {
+    animation-timing-function: ease-out;
+    stroke-dasharray: 175.93 351.86;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    animation-timing-function: steps(1, start);
+    stroke-dasharray: 175.93 351.86;
+    stroke-dashoffset: -175.93;
+    visibility: visible;
+  }
+  75%,
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes exalt-preloader-bouche2 {
+  from {
+    animation-timing-function: steps(1, end);
+    visibility: hidden;
+  }
+  50% {
+    animation-timing-function: ease-in-out;
+    visibility: visible;
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -351.86;
+  }
+}
+
+.exalt-preloader__oeil1,
+.exalt-preloader__oeil2,
+.exalt-preloader__bouche1,
+.exalt-preloader__bouche2 {
+  animation: exalt-preloader-oeil1 3s ease-in-out infinite;
+}
+
+.exalt-preloader__oeil1,
+.exalt-preloader__oeil2 {
+  transform-origin: 64px 64px;
+}
+
+.exalt-preloader__oeil2 {
+  animation-name: exalt-preloader-oeil2;
+}
+
+.exalt-preloader__bouche1,
+.exalt-preloader__bouche2 {
+  stroke-dasharray: 175.93 351.86;
+}
+
+.exalt-preloader__bouche1 {
+  animation-name: exalt-preloader-bouche1;
+}
+
+.exalt-preloader__bouche2 {
+  animation-name: exalt-preloader-bouche2;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exalt-preloader__oeil1,
+  .exalt-preloader__oeil2,
+  .exalt-preloader__bouche1 {
+    animation: none;
+    visibility: hidden;
+  }
+
+  .exalt-preloader__bouche2 {
+    animation: none;
+    visibility: visible;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+}

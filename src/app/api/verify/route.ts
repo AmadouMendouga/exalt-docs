@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin, DOCUMENTS_BUCKET } from "@/lib/supabase/admin";
 import { verifierCode } from "@/lib/codeAcces";
 import { consigner } from "@/lib/journal";
-import { estBloque, extraireIp, DUREE_BLOCAGE_MINUTES } from "@/lib/rateLimit";
+import { verifierBlocage, extraireIp } from "@/lib/rateLimit";
 
 const DUREE_URL_SIGNEE_SECONDES = 300; // 5 minutes
 
@@ -45,10 +45,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ erreur: "expire" }, { status: 403 });
   }
 
-  if (await estBloque({ documentId: document.id, ip })) {
+  const blocage = await verifierBlocage({ documentId: document.id, ip });
+  if (blocage.bloque) {
     await consigner({ documentId: document.id, evenement: "tentative", ip });
     return NextResponse.json(
-      { erreur: "trop_de_tentatives", dureeBlocageMinutes: DUREE_BLOCAGE_MINUTES },
+      { erreur: "trop_de_tentatives", debloqueLe: blocage.debloqueLe.toISOString() },
       { status: 429 }
     );
   }

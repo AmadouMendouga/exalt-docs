@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { regenererCode } from "./actions";
+import Preloader from "@/components/Preloader";
+import CocheSucces from "@/components/CocheSucces";
 
 export default function RegenererCodeBouton({ id }: { id: string }) {
   const [enCours, setEnCours] = useState(false);
@@ -40,17 +42,20 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
         type="button"
         onClick={regenerer}
         disabled={enCours}
-        className="text-sm underline disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 text-sm underline disabled:opacity-60"
         style={{ color: "#90503b" }}
       >
-        {enCours ? "..." : "Régénérer le code"}
+        {enCours && <Preloader taille={14} />}
+        {enCours ? "Régénération..." : "Régénérer le code"}
       </button>
 
-      {erreur && (
-        <p className="mt-1 text-xs" style={{ color: "#90503b" }}>
-          {erreur}
-        </p>
-      )}
+      <div role="status" aria-live="polite">
+        {erreur && (
+          <p className="mt-1 text-xs" style={{ color: "#90503b" }}>
+            {erreur}
+          </p>
+        )}
+      </div>
 
       {resultat && (
         <div
@@ -58,9 +63,10 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
           style={{ backgroundColor: "rgba(35,31,32,0.5)" }}
         >
           <div
-            className="flex w-full max-w-sm flex-col items-center gap-4 rounded-lg border bg-white p-6"
+            className="exalt-anim-fade-scale-in flex w-full max-w-sm flex-col items-center gap-4 rounded-lg border bg-white p-6"
             style={{ borderColor: "#dbc1b4" }}
           >
+            <CocheSucces taille={44} />
             <p className="text-center text-sm" style={{ color: "#231f20" }}>
               Nouveau code généré. Il ne sera plus jamais affiché en clair : transmettez-le
               maintenant.

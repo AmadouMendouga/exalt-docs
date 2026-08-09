@@ -3,6 +3,8 @@
 import { useRef, useState, SubmitEvent } from "react";
 import Link from "next/link";
 import { creerDocument, DocumentCree } from "./actions";
+import Preloader from "@/components/Preloader";
+import CocheSucces from "@/components/CocheSucces";
 
 export default function NouveauDocumentForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -69,19 +71,22 @@ export default function NouveauDocumentForm() {
         />
       </div>
 
-      {erreur && (
-        <p className="text-sm" style={{ color: "#90503b" }}>
-          {erreur}
-        </p>
-      )}
+      <div role="status" aria-live="polite">
+        {erreur && (
+          <p className="text-sm" style={{ color: "#90503b" }}>
+            {erreur}
+          </p>
+        )}
+      </div>
 
       <button
         type="submit"
         disabled={enCours}
-        className="mt-2 inline-flex items-center justify-center rounded px-6 py-3 text-sm font-medium tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="mt-2 inline-flex items-center justify-center gap-2 rounded px-6 py-3 text-sm font-medium tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         style={{ backgroundColor: "#cc7457" }}
       >
-        {enCours ? "Création en cours..." : "Créer le document"}
+        {enCours && <Preloader taille={18} />}
+        {enCours ? "Envoi sécurisé du document..." : "Créer le document"}
       </button>
     </form>
   );
@@ -115,13 +120,20 @@ function Champ(props: {
 
 function ResultatCreationVue({ document }: { document: DocumentCree }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="exalt-anim-fade-scale-in flex flex-col gap-6">
+      <div className="flex flex-col items-center gap-2">
+        <CocheSucces taille={44} />
+        <p className="font-serif text-lg" style={{ color: "#90503b" }}>
+          Document créé
+        </p>
+      </div>
+
       <div
         className="rounded border px-4 py-3 text-sm"
         style={{ borderColor: "#dbc1b4", backgroundColor: "#faf7f5", color: "#231f20" }}
       >
-        Document créé. Le code d&rsquo;accès ci-dessous ne sera plus jamais affiché en
-        clair : transmettez-le maintenant.
+        Le code d&rsquo;accès ci-dessous ne sera plus jamais affiché en clair :
+        transmettez-le maintenant.
       </div>
 
       <div className="flex flex-col items-center gap-3">
