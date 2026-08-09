@@ -140,11 +140,16 @@ Exalt Institut — Yassa, Nkolmbong
 NEXT_PUBLIC_SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_PASSWORD=
+SESSION_SECRET=
 INSTITUT_WHATSAPP=+237691927372
 NEXT_PUBLIC_SITE_URL=
 ```
 
 La clé `service_role` ne doit **jamais** être exposée côté client.
+
+`ADMIN_PASSWORD` (mot de passe de connexion) et `SESSION_SECRET` (secret de
+signature du cookie de session) sont deux valeurs distinctes — l'une ne doit
+jamais servir à dériver l'autre.
 
 ---
 

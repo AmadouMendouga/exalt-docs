@@ -27,13 +27,18 @@ Copier `.env.local.example` vers `.env.local` et renseigner :
 NEXT_PUBLIC_SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_PASSWORD=
+SESSION_SECRET=
 INSTITUT_WHATSAPP=+237691927372
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-- `ADMIN_PASSWORD` : mot de passe unique de l'espace `/admin`. Il sert aussi
-  de secret pour signer le cookie de session — choisir une valeur longue et
-  aléatoire.
+- `ADMIN_PASSWORD` : mot de passe unique de l'espace `/admin`, utilisé
+  uniquement pour la connexion — choisir une valeur longue et aléatoire.
+- `SESSION_SECRET` : secret distinct utilisé pour signer (HMAC) le cookie de
+  session admin. Doit être une valeur longue et aléatoire, différente
+  d'`ADMIN_PASSWORD` (ex. `openssl rand -hex 32`). Ne jamais la réutiliser
+  comme mot de passe : changer l'une ne doit pas invalider ou compromettre
+  l'autre.
 - `NEXT_PUBLIC_SITE_URL` : URL publique du site, utilisée pour construire le
   contenu des QR codes (`{NEXT_PUBLIC_SITE_URL}/d/{slug}`).
 - `SUPABASE_SERVICE_ROLE_KEY` ne doit **jamais** être préfixée `NEXT_PUBLIC_`
@@ -54,7 +59,7 @@ npm run dev
 
 1. Pousser le dépôt sur GitHub.
 2. Importer le projet dans Vercel (offre gratuite).
-3. Renseigner les 5 variables d'environnement ci-dessus dans
+3. Renseigner les 6 variables d'environnement ci-dessus dans
    **Project Settings > Environment Variables** (Production **et** Preview).
    Mettre à jour `NEXT_PUBLIC_SITE_URL` avec le domaine réel une fois attribué
    (nécessaire pour que les QR codes générés pointent vers la bonne URL).
