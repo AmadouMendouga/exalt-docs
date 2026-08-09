@@ -8,6 +8,7 @@ import { COOKIE_SESSION, creerJetonSession } from "@/lib/session";
 import { genererCodeAcces, hacherCode } from "@/lib/codeAcces";
 import { consigner } from "@/lib/journal";
 import { construireLienWhatsapp, messageAccesDocument } from "@/lib/notifications";
+import { genererQrPngDataUrl } from "@/lib/qr";
 import { env } from "@/lib/env";
 
 export async function revoquerDocument(formData: FormData) {
@@ -27,7 +28,7 @@ export async function revoquerDocument(formData: FormData) {
 }
 
 export type ResultatRegeneration =
-  | { succes: true; code: string; lienWhatsapp: string }
+  | { succes: true; code: string; qrDataUrl: string; lienWhatsapp: string }
   | { succes: false; erreur: string };
 
 export async function regenererCode(id: string): Promise<ResultatRegeneration> {
@@ -35,7 +36,7 @@ export async function regenererCode(id: string): Promise<ResultatRegeneration> {
 
   const { data: document, error: erreurLecture } = await supabase
     .from("documents")
-    .select("titre, client_nom, client_whatsapp")
+    .select("slug, titre, client_nom, client_whatsapp")
     .eq("id", id)
     .single();
 
@@ -59,12 +60,15 @@ export async function regenererCode(id: string): Promise<ResultatRegeneration> {
   await consigner({ documentId: id, evenement: "creation" });
   revalidatePath("/admin");
 
+  const urlPublique = `${env.siteUrl}/d/${document.slug}`;
+  const qrDataUrl = await genererQrPngDataUrl(urlPublique);
   const prenom = document.client_nom.split(" ")[0];
   const message = messageAccesDocument({ prenom, titre: document.titre, code });
 
   return {
     succes: true,
     code,
+    qrDataUrl,
     lienWhatsapp: construireLienWhatsapp(document.client_whatsapp, message),
   };
 }

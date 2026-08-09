@@ -5,7 +5,11 @@ import { regenererCode } from "./actions";
 
 export default function RegenererCodeBouton({ id }: { id: string }) {
   const [enCours, setEnCours] = useState(false);
-  const [resultat, setResultat] = useState<{ code: string; lienWhatsapp: string } | null>(null);
+  const [resultat, setResultat] = useState<{
+    code: string;
+    qrDataUrl: string;
+    lienWhatsapp: string;
+  } | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
 
   async function regenerer() {
@@ -61,6 +65,21 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
               Nouveau code généré. Il ne sera plus jamais affiché en clair : transmettez-le
               maintenant.
             </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={resultat.qrDataUrl}
+              alt="QR code du document"
+              className="h-48 w-48 rounded border p-2"
+              style={{ borderColor: "#dbc1b4" }}
+            />
+            <a
+              href={resultat.qrDataUrl}
+              download="qr-document.png"
+              className="text-sm underline"
+              style={{ color: "#90503b" }}
+            >
+              Télécharger le QR code (PNG)
+            </a>
             <span
               className="text-3xl font-semibold tracking-[0.3em]"
               style={{ color: "#90503b" }}
