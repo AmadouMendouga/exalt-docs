@@ -45,7 +45,7 @@ export async function creerDocument(formData: FormData): Promise<ResultatCreatio
   }
 
   const dateExpiration = dateExpirationBrute
-    ? new Date(dateExpirationBrute).toISOString()
+    ? new Date(`${dateExpirationBrute}T23:59:59.999Z`).toISOString()
     : null;
 
   const slug = genererSlug();

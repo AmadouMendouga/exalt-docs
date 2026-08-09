@@ -42,7 +42,7 @@ export default function NouveauDocumentForm() {
   return (
     <form ref={formRef} onSubmit={soumettre} className="flex flex-col gap-5">
       <Champ label="Titre du document" name="titre" required placeholder="Bon de soin — 25 000 FCFA" />
-      <Champ label="Nom de la cliente" name="client_nom" required placeholder="Aïssatou Mballa" />
+      <Champ label="Nom de la cliente" name="client_nom" required placeholder="Amadou Mendouga" />
       <Champ
         label="Numéro WhatsApp"
         name="client_whatsapp"
