@@ -30,12 +30,14 @@ export function messageAccesDocument(params: {
   prenom: string;
   titre: string;
   code: string;
+  lien: string;
 }): string {
-  const { prenom, titre, code } = params;
+  const { prenom, titre, code, lien } = params;
   return `Bonjour ${prenom},
 
 Votre ${titre} Exalt Institut est disponible.
-Scannez le QR code figurant sur votre bon, puis saisissez ce code d'accès :
+Consultez-le ici : ${lien}
+Code d'accès :
 
 ${code}
 

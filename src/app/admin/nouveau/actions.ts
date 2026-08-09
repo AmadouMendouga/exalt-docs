@@ -90,7 +90,7 @@ export async function creerDocument(formData: FormData): Promise<ResultatCreatio
   const urlPublique = `${env.siteUrl}/d/${slug}`;
   const qrDataUrl = await genererQrPngDataUrl(urlPublique);
   const prenom = clientNom.split(" ")[0];
-  const message = messageAccesDocument({ prenom, titre, code });
+  const message = messageAccesDocument({ prenom, titre, code, lien: urlPublique });
 
   return {
     succes: true,

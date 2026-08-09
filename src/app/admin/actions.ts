@@ -3,13 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { supabaseAdmin, DOCUMENTS_BUCKET } from "@/lib/supabase/admin";
 import { COOKIE_SESSION, creerJetonSession } from "@/lib/session";
 import { genererCodeAcces, hacherCode } from "@/lib/codeAcces";
 import { consigner } from "@/lib/journal";
 import { construireLienWhatsapp, messageAccesDocument } from "@/lib/notifications";
 import { genererQrPngDataUrl } from "@/lib/qr";
 import { env } from "@/lib/env";
+
+const DUREE_URL_SIGNEE_SECONDES = 300;
 
 export async function revoquerDocument(formData: FormData) {
   const id = String(formData.get("id") ?? "");
@@ -22,6 +24,55 @@ export async function revoquerDocument(formData: FormData) {
 
   if (error) {
     console.error("Échec de révocation :", error.message);
+  }
+
+  revalidatePath("/admin");
+}
+
+export type ResultatUrlDocument =
+  | { succes: true; url: string }
+  | { succes: false; erreur: string };
+
+export async function obtenirUrlDocument(id: string): Promise<ResultatUrlDocument> {
+  const supabase = supabaseAdmin();
+
+  const { data: document, error: erreurLecture } = await supabase
+    .from("documents")
+    .select("fichier_path")
+    .eq("id", id)
+    .single();
+
+  if (erreurLecture || !document) {
+    return { succes: false, erreur: "Document introuvable." };
+  }
+
+  const { data: urlSignee, error: erreurUrl } = await supabase.storage
+    .from(DOCUMENTS_BUCKET)
+    .createSignedUrl(document.fichier_path, DUREE_URL_SIGNEE_SECONDES);
+
+  if (erreurUrl || !urlSignee) {
+    return { succes: false, erreur: "Échec de génération du lien." };
+  }
+
+  return { succes: true, url: urlSignee.signedUrl };
+}
+
+export async function supprimerDocument(id: string): Promise<void> {
+  const supabase = supabaseAdmin();
+
+  const { data: document } = await supabase
+    .from("documents")
+    .select("fichier_path")
+    .eq("id", id)
+    .single();
+
+  if (document) {
+    await supabase.storage.from(DOCUMENTS_BUCKET).remove([document.fichier_path]);
+  }
+
+  const { error } = await supabase.from("documents").delete().eq("id", id);
+  if (error) {
+    console.error("Échec de suppression :", error.message);
   }
 
   revalidatePath("/admin");
@@ -63,7 +114,12 @@ export async function regenererCode(id: string): Promise<ResultatRegeneration> {
   const urlPublique = `${env.siteUrl}/d/${document.slug}`;
   const qrDataUrl = await genererQrPngDataUrl(urlPublique);
   const prenom = document.client_nom.split(" ")[0];
-  const message = messageAccesDocument({ prenom, titre: document.titre, code });
+  const message = messageAccesDocument({
+    prenom,
+    titre: document.titre,
+    code,
+    lien: urlPublique,
+  });
 
   return {
     succes: true,

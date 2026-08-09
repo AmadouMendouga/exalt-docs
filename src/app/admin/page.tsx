@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { compterConsultations } from "@/lib/journal";
 import { revoquerDocument } from "./actions";
 import RegenererCodeBouton from "./RegenererCodeBouton";
+import VoirDocumentBouton from "./VoirDocumentBouton";
+import SupprimerDocumentBouton from "./SupprimerDocumentBouton";
 
 export const dynamic = "force-dynamic";
 
@@ -95,25 +97,25 @@ export default async function PageAdmin() {
                         {consultations[i]}
                       </td>
                       <td className="px-4 py-3">
-                        {doc.actif ? (
-                          <div className="flex flex-col items-start gap-1.5">
-                            <RegenererCodeBouton id={doc.id} />
-                            <form action={revoquerDocument}>
-                              <input type="hidden" name="id" value={doc.id} />
-                              <button
-                                type="submit"
-                                className="text-sm underline"
-                                style={{ color: "#90503b" }}
-                              >
-                                Révoquer
-                              </button>
-                            </form>
-                          </div>
-                        ) : (
-                          <span className="text-sm" style={{ color: "#231f20", opacity: 0.4 }}>
-                            —
-                          </span>
-                        )}
+                        <div className="flex flex-col items-start gap-1.5">
+                          <VoirDocumentBouton id={doc.id} />
+                          {doc.actif && (
+                            <>
+                              <RegenererCodeBouton id={doc.id} />
+                              <form action={revoquerDocument}>
+                                <input type="hidden" name="id" value={doc.id} />
+                                <button
+                                  type="submit"
+                                  className="text-sm underline"
+                                  style={{ color: "#90503b" }}
+                                >
+                                  Révoquer
+                                </button>
+                              </form>
+                            </>
+                          )}
+                          <SupprimerDocumentBouton id={doc.id} />
+                        </div>
                       </td>
                     </tr>
                   );
