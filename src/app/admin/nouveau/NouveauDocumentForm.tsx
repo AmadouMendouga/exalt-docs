@@ -8,6 +8,14 @@ import CocheSucces from "@/components/CocheSucces";
 import { attendreMinimum } from "@/lib/attendreMinimum";
 
 const DUREE_MIN_CHARGEMENT_MS = 600;
+const TAILLE_MAX_FICHIER_OCTETS = 4 * 1024 * 1024;
+
+function dateAujourdhui(): string {
+  const maintenant = new Date();
+  const mois = String(maintenant.getMonth() + 1).padStart(2, "0");
+  const jour = String(maintenant.getDate()).padStart(2, "0");
+  return `${maintenant.getFullYear()}-${mois}-${jour}`;
+}
 
 export default function NouveauDocumentForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -21,6 +29,13 @@ export default function NouveauDocumentForm() {
     setErreur(null);
 
     const formData = new FormData(e.currentTarget);
+    const fichier = formData.get("fichier");
+    if (fichier instanceof File && fichier.size > TAILLE_MAX_FICHIER_OCTETS) {
+      setErreur("Le fichier PDF est trop volumineux (4 Mo maximum). Compressez-le et réessayez.");
+      setEnCours(false);
+      return;
+    }
+
     try {
       const reponse = await attendreMinimum(creerDocument(formData), DUREE_MIN_CHARGEMENT_MS);
 
@@ -58,6 +73,7 @@ export default function NouveauDocumentForm() {
         label="Date d'expiration (facultative)"
         name="date_expiration"
         type="date"
+        min={dateAujourdhui()}
       />
 
       <div className="flex flex-col gap-1.5">
@@ -101,8 +117,9 @@ function Champ(props: {
   required?: boolean;
   placeholder?: string;
   type?: string;
+  min?: string;
 }) {
-  const { label, name, required, placeholder, type = "text" } = props;
+  const { label, name, required, placeholder, type = "text", min } = props;
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={name} className="text-sm font-medium" style={{ color: "#231f20" }}>
@@ -112,6 +129,7 @@ function Champ(props: {
         id={name}
         name={name}
         type={type}
+        min={min}
         required={required}
         placeholder={placeholder}
         className="rounded border bg-white px-3 py-2 text-sm outline-none focus:ring-2"
@@ -167,6 +185,22 @@ function ResultatCreationVue({ document }: { document: DocumentCree }) {
         >
           {document.code}
         </span>
+      </div>
+
+      <div className="flex flex-col items-center gap-0.5">
+        <span
+          className="text-xs uppercase tracking-widest"
+          style={{ color: "#231f20", opacity: 0.5 }}
+        >
+          Numéro du bon (secours)
+        </span>
+        <span className="font-mono text-sm tracking-wide" style={{ color: "#231f20" }}>
+          {document.slug}
+        </span>
+        <p className="max-w-xs text-center text-xs" style={{ color: "#231f20", opacity: 0.55 }}>
+          À reporter sur le bon papier : permet à la cliente d&rsquo;accéder au document si le QR
+          code est illisible.
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">

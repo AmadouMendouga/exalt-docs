@@ -15,6 +15,8 @@ import {
 } from "@/lib/notifications";
 import { env } from "@/lib/env";
 
+const TAILLE_MAX_FICHIER_OCTETS = 4 * 1024 * 1024;
+
 export type ResultatCreation =
   | { succes: true; document: DocumentCree }
   | { succes: false; erreur: string };
@@ -47,9 +49,23 @@ export async function creerDocument(formData: FormData): Promise<ResultatCreatio
     return { succes: false, erreur: "Le fichier doit être un PDF." };
   }
 
+  if (fichier.size > TAILLE_MAX_FICHIER_OCTETS) {
+    return {
+      succes: false,
+      erreur: "Le fichier PDF est trop volumineux (4 Mo maximum). Compressez-le et réessayez.",
+    };
+  }
+
   const dateExpiration = dateExpirationBrute
     ? new Date(`${dateExpirationBrute}T23:59:59.999Z`).toISOString()
     : null;
+
+  if (dateExpiration && new Date(dateExpiration) < new Date()) {
+    return {
+      succes: false,
+      erreur: "La date d'expiration ne peut pas être dans le passé.",
+    };
+  }
 
   const slug = genererSlug();
   const code = genererCodeAcces();
