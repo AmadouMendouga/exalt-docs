@@ -12,6 +12,7 @@ const DUREE_MIN_CHARGEMENT_MS = 600;
 export default function RegenererCodeBouton({ id }: { id: string }) {
   const [enCours, setEnCours] = useState(false);
   const [resultat, setResultat] = useState<{
+    slug: string;
     code: string;
     qrDataUrl: string;
     envoiWhatsapp: ResultatEnvoi;
@@ -96,6 +97,17 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
             >
               {resultat.code}
             </span>
+            <div className="flex flex-col items-center gap-0.5">
+              <span
+                className="text-xs uppercase tracking-widest"
+                style={{ color: "#231f20", opacity: 0.5 }}
+              >
+                Numéro du bon (secours)
+              </span>
+              <span className="font-mono text-sm tracking-wide" style={{ color: "#231f20" }}>
+                {resultat.slug}
+              </span>
+            </div>
             {resultat.envoiWhatsapp.mode === "api" ? (
               <div
                 className="flex w-full items-center justify-center gap-2 rounded px-4 py-3 text-center text-sm font-medium"

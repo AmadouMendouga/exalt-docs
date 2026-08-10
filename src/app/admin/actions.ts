@@ -85,7 +85,7 @@ export async function supprimerDocument(id: string): Promise<void> {
 }
 
 export type ResultatRegeneration =
-  | { succes: true; code: string; qrDataUrl: string; envoiWhatsapp: ResultatEnvoi }
+  | { succes: true; slug: string; code: string; qrDataUrl: string; envoiWhatsapp: ResultatEnvoi }
   | { succes: false; erreur: string };
 
 export async function regenererCode(id: string): Promise<ResultatRegeneration> {
@@ -149,6 +149,7 @@ export async function regenererCode(id: string): Promise<ResultatRegeneration> {
 
   return {
     succes: true,
+    slug: document.slug,
     code,
     qrDataUrl,
     envoiWhatsapp,
