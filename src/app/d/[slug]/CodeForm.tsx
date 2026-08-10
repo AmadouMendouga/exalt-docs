@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import { Document, Page, pdfjs } from "react-pdf";
 import CodeInputOtp from "./CodeInputOtp";
 import Preloader from "@/components/Preloader";
@@ -38,6 +39,11 @@ function formaterCompteARebours(millisecondes: number): string {
 }
 
 export default function CodeForm({ slug }: { slug: string }) {
+  // Précharge le worker pdf.js pendant que la cliente saisit son code, pour
+  // ne pas ajouter ce téléchargement (~1,5 Mo) au temps d'attente perçu après
+  // validation du code.
+  preload("/pdf.worker.min.mjs", { as: "script" });
+
   const [code, setCode] = useState("");
   const [etat, setEtat] = useState<Etat>({ phase: "saisie" });
   const [secousseId, setSecousseId] = useState(0);
@@ -147,7 +153,21 @@ export default function CodeForm({ slug }: { slug: string }) {
               setNombrePages(numPages);
               setPageActuelle(1);
             }}
-            loading={largeurConteneur > 0 ? <SkeletonDocument largeur={largeurConteneur} /> : null}
+            loading={
+              largeurConteneur > 0 ? (
+                <div className="flex flex-col items-center gap-3 py-2">
+                  <SkeletonDocument largeur={largeurConteneur} />
+                  <p
+                    role="status"
+                    aria-live="polite"
+                    className="text-xs"
+                    style={{ color: "#231f20", opacity: 0.55 }}
+                  >
+                    Chargement sécurisé du document...
+                  </p>
+                </div>
+              ) : null
+            }
             error={
               <p className="p-8 text-sm" style={{ color: "#90503b" }}>
                 Impossible d&rsquo;afficher l&rsquo;aperçu. Utilisez le téléchargement ci-dessous.
