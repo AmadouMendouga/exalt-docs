@@ -7,7 +7,13 @@ import { supabaseAdmin, DOCUMENTS_BUCKET } from "@/lib/supabase/admin";
 import { COOKIE_SESSION, creerJetonSession } from "@/lib/session";
 import { genererCodeAcces, hacherCode } from "@/lib/codeAcces";
 import { consigner } from "@/lib/journal";
-import { construireLienWhatsapp, messageAccesDocument } from "@/lib/notifications";
+import {
+  construireLienWhatsapp,
+  envoyerNotification,
+  ErreurEnvoiWhatsapp,
+  messageAccesDocument,
+  ResultatEnvoi,
+} from "@/lib/notifications";
 import { genererQrPngDataUrl } from "@/lib/qr";
 import { env } from "@/lib/env";
 
@@ -79,7 +85,7 @@ export async function supprimerDocument(id: string): Promise<void> {
 }
 
 export type ResultatRegeneration =
-  | { succes: true; code: string; qrDataUrl: string; lienWhatsapp: string }
+  | { succes: true; code: string; qrDataUrl: string; envoiWhatsapp: ResultatEnvoi }
   | { succes: false; erreur: string };
 
 export async function regenererCode(id: string): Promise<ResultatRegeneration> {
@@ -114,18 +120,38 @@ export async function regenererCode(id: string): Promise<ResultatRegeneration> {
   const urlPublique = `${env.siteUrl}/d/${document.slug}`;
   const qrDataUrl = await genererQrPngDataUrl(urlPublique);
   const prenom = document.client_nom.split(" ")[0];
-  const message = messageAccesDocument({
-    prenom,
-    titre: document.titre,
-    code,
-    lien: urlPublique,
-  });
+
+  let envoiWhatsapp: ResultatEnvoi;
+  try {
+    envoiWhatsapp = await envoyerNotification(document.client_whatsapp, {
+      prenom,
+      titre: document.titre,
+      lien: urlPublique,
+      code,
+    });
+  } catch (erreur) {
+    if (erreur instanceof ErreurEnvoiWhatsapp) {
+      console.error("Échec de l'envoi WhatsApp automatique :", erreur.status);
+    } else {
+      console.error("Échec de l'envoi WhatsApp automatique.");
+    }
+    const message = messageAccesDocument({
+      prenom,
+      titre: document.titre,
+      code,
+      lien: urlPublique,
+    });
+    envoiWhatsapp = {
+      mode: "lien-manuel",
+      url: construireLienWhatsapp(document.client_whatsapp, message),
+    };
+  }
 
   return {
     succes: true,
     code,
     qrDataUrl,
-    lienWhatsapp: construireLienWhatsapp(document.client_whatsapp, message),
+    envoiWhatsapp,
   };
 }
 

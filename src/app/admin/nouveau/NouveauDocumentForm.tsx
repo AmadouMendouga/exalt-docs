@@ -170,15 +170,25 @@ function ResultatCreationVue({ document }: { document: DocumentCree }) {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <a
-          href={document.lienWhatsappClient}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 rounded px-4 py-3 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "#25D366" }}
-        >
-          Envoyer par WhatsApp
-        </a>
+        {document.envoiWhatsapp.mode === "api" ? (
+          <div
+            className="flex flex-1 items-center justify-center gap-2 rounded px-4 py-3 text-center text-sm font-medium"
+            style={{ backgroundColor: "#e8f3ec", color: "#1f7a3f" }}
+          >
+            <CocheSucces taille={20} />
+            Envoyé automatiquement par WhatsApp
+          </div>
+        ) : (
+          <a
+            href={document.envoiWhatsapp.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 rounded px-4 py-3 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#25D366" }}
+          >
+            Envoyer par WhatsApp
+          </a>
+        )}
         <a
           href={document.lienNotificationInstitut}
           target="_blank"

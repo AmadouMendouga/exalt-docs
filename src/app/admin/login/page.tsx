@@ -1,4 +1,5 @@
 import { connexionAdmin } from "../actions";
+import BoutonConnexion from "./BoutonConnexion";
 
 export default async function PageConnexionAdmin({
   searchParams,
@@ -41,13 +42,7 @@ export default async function PageConnexionAdmin({
               </p>
             )}
 
-            <button
-              type="submit"
-              className="mt-2 rounded px-6 py-3 text-sm font-medium tracking-wide text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#cc7457" }}
-            >
-              Se connecter
-            </button>
+            <BoutonConnexion />
           </form>
         </div>
       </div>

@@ -7,8 +7,11 @@ import { genererQrPngDataUrl } from "@/lib/qr";
 import { consigner } from "@/lib/journal";
 import {
   construireLienWhatsapp,
+  envoyerNotification,
+  ErreurEnvoiWhatsapp,
   lienNotificationInstitut,
   messageAccesDocument,
+  ResultatEnvoi,
 } from "@/lib/notifications";
 import { env } from "@/lib/env";
 
@@ -21,7 +24,7 @@ export type DocumentCree = {
   code: string;
   urlPublique: string;
   qrDataUrl: string;
-  lienWhatsappClient: string;
+  envoiWhatsapp: ResultatEnvoi;
   lienNotificationInstitut: string;
 };
 
@@ -90,7 +93,24 @@ export async function creerDocument(formData: FormData): Promise<ResultatCreatio
   const urlPublique = `${env.siteUrl}/d/${slug}`;
   const qrDataUrl = await genererQrPngDataUrl(urlPublique);
   const prenom = clientNom.split(" ")[0];
-  const message = messageAccesDocument({ prenom, titre, code, lien: urlPublique });
+
+  let envoiWhatsapp: ResultatEnvoi;
+  try {
+    envoiWhatsapp = await envoyerNotification(clientWhatsapp, {
+      prenom,
+      titre,
+      lien: urlPublique,
+      code,
+    });
+  } catch (erreur) {
+    if (erreur instanceof ErreurEnvoiWhatsapp) {
+      console.error("Échec de l'envoi WhatsApp automatique :", erreur.status);
+    } else {
+      console.error("Échec de l'envoi WhatsApp automatique.");
+    }
+    const message = messageAccesDocument({ prenom, titre, code, lien: urlPublique });
+    envoiWhatsapp = { mode: "lien-manuel", url: construireLienWhatsapp(clientWhatsapp, message) };
+  }
 
   return {
     succes: true,
@@ -99,7 +119,7 @@ export async function creerDocument(formData: FormData): Promise<ResultatCreatio
       code,
       urlPublique,
       qrDataUrl,
-      lienWhatsappClient: construireLienWhatsapp(clientWhatsapp, message),
+      envoiWhatsapp,
       lienNotificationInstitut: lienNotificationInstitut(titre, clientNom),
     },
   };

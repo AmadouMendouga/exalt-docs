@@ -5,6 +5,7 @@ import { regenererCode } from "./actions";
 import Preloader from "@/components/Preloader";
 import CocheSucces from "@/components/CocheSucces";
 import { attendreMinimum } from "@/lib/attendreMinimum";
+import type { ResultatEnvoi } from "@/lib/notifications";
 
 const DUREE_MIN_CHARGEMENT_MS = 600;
 
@@ -13,7 +14,7 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
   const [resultat, setResultat] = useState<{
     code: string;
     qrDataUrl: string;
-    lienWhatsapp: string;
+    envoiWhatsapp: ResultatEnvoi;
   } | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
 
@@ -95,15 +96,25 @@ export default function RegenererCodeBouton({ id }: { id: string }) {
             >
               {resultat.code}
             </span>
-            <a
-              href={resultat.lienWhatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full rounded px-4 py-3 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "#25D366" }}
-            >
-              Envoyer par WhatsApp
-            </a>
+            {resultat.envoiWhatsapp.mode === "api" ? (
+              <div
+                className="flex w-full items-center justify-center gap-2 rounded px-4 py-3 text-center text-sm font-medium"
+                style={{ backgroundColor: "#e8f3ec", color: "#1f7a3f" }}
+              >
+                <CocheSucces taille={20} />
+                Envoyé automatiquement par WhatsApp
+              </div>
+            ) : (
+              <a
+                href={resultat.envoiWhatsapp.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full rounded px-4 py-3 text-center text-sm font-medium text-white transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "#25D366" }}
+              >
+                Envoyer par WhatsApp
+              </a>
+            )}
             <button
               type="button"
               onClick={() => setResultat(null)}
