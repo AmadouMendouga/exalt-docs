@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SaisieNumeroBon from "./SaisieNumeroBon";
 
 const NUMERO_WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
@@ -5,9 +6,9 @@ const MESSAGE_AIDE = "Bonjour, je n'arrive pas à ouvrir mon document Exalt.";
 const LIEN_WHATSAPP = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(MESSAGE_AIDE)}`;
 
 const ETAPES = [
-  { titre: "Scannez", description: "Scannez le QR code imprimé sur votre bon avec l'appareil photo de votre téléphone." },
-  { titre: "Saisissez le code", description: "Entrez le code d'accès à 6 caractères reçu par WhatsApp de la part de l'institut." },
-  { titre: "Consultez", description: "Votre document s'affiche et peut être téléchargé pour le conserver hors connexion." },
+  "Scannez le QR code imprimé sur votre bon avec l'appareil photo de votre téléphone.",
+  "Entrez le code d'accès à 6 caractères reçu par WhatsApp de la part de l'institut.",
+  "Votre document s'affiche et peut être téléchargé pour le conserver hors connexion.",
 ];
 
 const REASSURANCES = [
@@ -51,9 +52,21 @@ const REASSURANCES = [
 export default function Home() {
   return (
     <div
-      className="flex flex-1 flex-col items-center px-6 py-12"
+      className="relative flex flex-1 flex-col items-center px-6 py-12"
       style={{ backgroundColor: "#faf7f5" }}
     >
+      <Link
+        href="/admin"
+        aria-label="Espace administrateur"
+        className="fixed top-4 right-4 z-10 flex items-center gap-1.5 rounded-full border bg-white px-3 py-2 text-xs font-medium tracking-wide shadow-sm transition-opacity hover:opacity-80 sm:top-6 sm:right-6"
+        style={{ borderColor: "#dbc1b4", color: "#90503b" }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+        Ad
+      </Link>
+
       <div className="flex w-full max-w-md flex-col items-center gap-10">
         <div className="flex flex-col items-center gap-1 text-center">
           <span
@@ -89,7 +102,7 @@ export default function Home() {
           </h2>
           <ol className="flex flex-col gap-3">
             {ETAPES.map((etape, index) => (
-              <li key={etape.titre} className="flex items-start gap-3">
+              <li key={etape} className="flex items-start gap-3">
                 <span
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
                   style={{ backgroundColor: "#dbc1b4", color: "#90503b" }}
@@ -97,7 +110,7 @@ export default function Home() {
                   {index + 1}
                 </span>
                 <p className="pt-0.5 text-sm" style={{ color: "#231f20" }}>
-                  <span className="font-medium">{etape.titre}.</span> {etape.description}
+                  {etape}
                 </p>
               </li>
             ))}
